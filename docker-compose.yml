@@ -1,0 +1,29 @@
+services:
+  mongo:
+    image: mongo:7
+    volumes: [mongo_data:/data/db]
+    ports: ["27017:27017"]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]   # cache only, no persistence needed
+    ports: ["6379:6379"]
+
+  ml:
+    build: ./ml
+    ports: ["5001:5001"]
+    volumes: [ml_models:/app/models]
+
+  backend:
+    build: ./backend
+    ports: ["4000:4000"]
+    env_file: ./backend/.env        # copy backend/.env.example -> backend/.env first
+    environment:                    # override hostnames for the docker network
+      MONGO_URI: mongodb://mongo:27017/url_shortener
+      REDIS_URL: redis://redis:6379
+      ML_SERVICE_URL: http://ml:5001
+    depends_on: [mongo, redis, ml]
+
+volumes:
+  mongo_data:
+  ml_models:

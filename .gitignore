@@ -1,0 +1,18 @@
+node_modules/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+dist/
+coverage/
+.DS_Store
+# ML artifacts (use Git LFS/release assets if you want to share a model)
+ml/models/*.pkl
+ml/models/model_meta.json
+ml/data/raw/*
+ml/data/processed/*
+!ml/data/raw/.gitkeep
+!ml/data/processed/.gitkeep
