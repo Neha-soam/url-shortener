@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAnalytics } from '../services/analyticsService.js';
+import Loading from './Loading.jsx';
+import ErrorMessage from './ErrorMessage.jsx';
 
 const List = ({ title, items }) => (
   <div><b>{title}</b><ul>{items.map((i) => <li key={i.label}>{i.label}: {i.count}</li>)}</ul></div>
@@ -7,10 +9,17 @@ const List = ({ title, items }) => (
 
 export default function AnalyticsPanel({ urlId }) {
   const [data, setData] = useState(null);
-  const [error, setError] = useState('');
-  useEffect(() => { getAnalytics(urlId).then(setData).catch((e) => setError(e.message)); }, [urlId]);
-  if (error) return <p className="err">{error}</p>;
-  if (!data) return <p>Loading…</p>;
+  const [status, setStatus] = useState('loading');
+
+  const load = () => {
+    setStatus('loading');
+    getAnalytics(urlId).then((d) => { setData(d); setStatus('ready'); }).catch(() => setStatus('error'));
+  };
+  useEffect(() => { load(); }, [urlId]);
+
+  if (status === 'loading') return <Loading label="Loading analytics…" />;
+  if (status === 'error') return <ErrorMessage message="We couldn't load analytics for this link." onRetry={load} />;
+
   return (
     <div>
       <p><b>{data.totalClicks}</b> clicks in the last {data.rangeDays} days</p>

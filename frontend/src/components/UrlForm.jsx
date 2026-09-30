@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { shorten } from '../services/urlService.js';
+import { useToast } from './Toast.jsx';
+import ErrorMessage from './ErrorMessage.jsx';
 
 export default function UrlForm({ onCreated }) {
+  const showToast = useToast();
   const [url, setUrl] = useState('');
   const [alias, setAlias] = useState('');
   const [days, setDays] = useState('');
@@ -14,7 +17,9 @@ export default function UrlForm({ onCreated }) {
       const body = { url };
       if (alias) body.customAlias = alias;
       if (days) body.expiresInDays = Number(days);
-      onCreated(await shorten(body));
+      const doc = await shorten(body);
+      showToast('Short link created');
+      onCreated(doc);
     } catch (e) { setError(e.message); } finally { setBusy(false); }
   };
 
@@ -37,7 +42,7 @@ export default function UrlForm({ onCreated }) {
         </div>
       </div>
       <button onClick={submit} disabled={busy || !url}>{busy ? 'Shortening…' : 'Shorten'}</button>
-      {error && <p className="err">{error}</p>}
+      {error && <ErrorMessage message={error} />}
     </div>
   );
 }

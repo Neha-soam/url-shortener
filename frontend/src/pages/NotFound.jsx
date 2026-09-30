@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import EmptyState from '../components/EmptyState.jsx';
 
 export default function NotFound() {
   return (
-    <div className="empty-state" style={{ marginTop: 40 }}>
-      <p style={{ marginBottom: 12 }}>We couldn't find that page.</p>
-      <Link to="/"><button className="secondary">Back to home</button></Link>
+    <div style={{ marginTop: 40 }}>
+      <EmptyState
+        message="We couldn't find that page."
+        action={<Link to="/"><button className="secondary">Back to home</button></Link>}
+      />
     </div>
   );
 }

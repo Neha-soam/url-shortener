@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import ErrorMessage from '../components/ErrorMessage.jsx';
 
 // States per CLAUDE.md section 12: idle / submitting / validation error / server error / success
 export default function Register({ onDone }) {
@@ -58,7 +59,7 @@ export default function Register({ onDone }) {
         <button type="submit" disabled={status === 'submitting'}>
           {status === 'submitting' ? 'Creating account…' : 'Register'}
         </button>
-        {error && <p className="err" role="alert">{error}</p>}
+        {error && <ErrorMessage message={error} />}
       </form>
       <p className="meta" style={{ marginTop: 16 }}>
         Already have an account? <Link to="/login" style={{ color: 'var(--accent)' }}>Log in</Link>
