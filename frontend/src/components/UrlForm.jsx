@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { shorten } from '../services/api.js';
+import { shorten } from '../services/urlService.js';
 
 export default function UrlForm({ onCreated }) {
   const [url, setUrl] = useState('');
@@ -20,10 +20,21 @@ export default function UrlForm({ onCreated }) {
 
   return (
     <div className="card">
-      <div className="row"><input placeholder="https://long-url.example/..." value={url} onChange={(e) => setUrl(e.target.value)} /></div>
       <div className="row">
-        <input placeholder="Custom alias (optional)" value={alias} onChange={(e) => setAlias(e.target.value)} />
-        <input placeholder="Expires in days (optional)" type="number" min="1" max="365" value={days} onChange={(e) => setDays(e.target.value)} />
+        <div style={{ flex: 1 }}>
+          <label className="field-label" htmlFor="url">URL to shorten</label>
+          <input id="url" placeholder="https://long-url.example/..." value={url} onChange={(e) => setUrl(e.target.value)} />
+        </div>
+      </div>
+      <div className="row">
+        <div style={{ flex: 1 }}>
+          <label className="field-label" htmlFor="alias">Custom alias (optional)</label>
+          <input id="alias" placeholder="my-link" value={alias} onChange={(e) => setAlias(e.target.value)} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label className="field-label" htmlFor="days">Expires in days (optional)</label>
+          <input id="days" placeholder="e.g. 7" type="number" min="1" max="365" value={days} onChange={(e) => setDays(e.target.value)} />
+        </div>
       </div>
       <button onClick={submit} disabled={busy || !url}>{busy ? 'Shortening…' : 'Shorten'}</button>
       {error && <p className="err">{error}</p>}

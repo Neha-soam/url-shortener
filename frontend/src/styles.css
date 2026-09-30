@@ -1,12 +1,204 @@
-body { font-family: system-ui, sans-serif; margin: 0; background: #f6f7f9; color: #1c1e21; }
-main { max-width: 760px; margin: 0 auto; padding: 24px 16px; }
-nav { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; }
+/* ---------------------------------------------------------------
+   Design tokens
+   Subject: a URL shortener with an ML "is this link safe" check.
+   Treated like a small security/dev tool console, not a generic
+   SaaS landing page -- flat panels + hairlines, no card-shadow kit.
+
+   Color   bg #0B1220, surface #121B2E, border #24304C,
+           text #E7ECF6, muted #8C9BB5, accent (link) #4C8DFF,
+           safe #22C55E, risk #F5455C, neutral badge #64748B
+   Type    Inter for UI text, IBM Plex Mono for URLs/codes/scores
+           (monospace here is functional -- it's literal data, not decoration)
+   Layout  single left-aligned column, flat 1px-bordered panels,
+           plain underline nav links instead of pill buttons
+------------------------------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0b1220;
+  --surface: #121b2e;
+  --surface-raised: #1a2540;
+  --border: #24304c;
+  --text: #e7ecf6;
+  --text-muted: #8c9bb5;
+  --accent: #4c8dff;
+  --accent-ink: #eaf1ff;
+  --safe: #22c55e;
+  --risk: #f5455c;
+  --neutral: #64748b;
+  --radius: 10px;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  overflow-wrap: break-word; /* safety net: nothing forces horizontal scroll on narrow screens */
+}
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+
+/* ---------- nav ---------- */
+nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 22px 20px;
+  border-bottom: 1px solid var(--border);
+}
+nav h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
 nav .spacer { flex: 1; }
-button { padding: 8px 14px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; cursor: pointer; }
-button.secondary { background: #e5e7eb; color: #111; }
-input { padding: 8px; border: 1px solid #ccd; border-radius: 6px; width: 100%; box-sizing: border-box; }
-.card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.row { display: flex; gap: 8px; margin-bottom: 8px; }
-.badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; color: #fff; }
-.err { color: #b91c1c; }
-small { color: #555; }
+nav a { text-decoration: none; }
+nav button.secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 6px 2px;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  transition: color .15s ease, border-color .15s ease;
+}
+nav button.secondary:hover { color: var(--text); border-color: var(--text-muted); }
+
+/* ---------- intro copy ---------- */
+.intro { margin: 32px 0 20px; max-width: 52ch; }
+.intro h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 8px; }
+.intro p { color: var(--text-muted); margin: 0; }
+
+/* ---------- panels ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.row:last-child { margin-bottom: 0; }
+
+label.field-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color .15s ease;
+}
+input::placeholder { color: var(--text-muted); }
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+input:focus-visible { box-shadow: 0 0 0 3px rgba(76, 141, 255, 0.25); }
+
+button {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter .15s ease;
+}
+button:hover:not(:disabled) { filter: brightness(1.1); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+button.secondary {
+  background: var(--surface-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ---------- result / links / code ---------- */
+.result-url {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--accent);
+  word-break: break-all;
+}
+
+small, .meta {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ---------- risk badge ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #051007;
+}
+.badge.safe { background: var(--safe); }
+.badge.risk { background: var(--risk); color: #2b0207; }
+.badge.neutral { background: var(--neutral); color: #050a11; }
+
+.explanation {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ---------- states ---------- */
+.err {
+  color: var(--risk);
+  font-size: 13.5px;
+  margin: 8px 0 0;
+}
+.empty-state {
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 480px) {
+  main { padding: 0 14px 48px; }
+  nav { flex-wrap: wrap; padding: 16px 14px; }
+  .row { flex-direction: column; }
+}

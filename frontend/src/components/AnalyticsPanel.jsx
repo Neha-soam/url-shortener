@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { analytics } from '../services/api.js';
+import { getAnalytics } from '../services/analyticsService.js';
 
 const List = ({ title, items }) => (
   <div><b>{title}</b><ul>{items.map((i) => <li key={i.label}>{i.label}: {i.count}</li>)}</ul></div>
@@ -8,7 +8,7 @@ const List = ({ title, items }) => (
 export default function AnalyticsPanel({ urlId }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
-  useEffect(() => { analytics(urlId).then(setData).catch((e) => setError(e.message)); }, [urlId]);
+  useEffect(() => { getAnalytics(urlId).then(setData).catch((e) => setError(e.message)); }, [urlId]);
   if (error) return <p className="err">{error}</p>;
   if (!data) return <p>Loading…</p>;
   return (
