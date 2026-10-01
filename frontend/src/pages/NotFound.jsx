@@ -7,7 +7,7 @@ export default function NotFound() {
     <div style={{ marginTop: 40 }}>
       <EmptyState
         message="We couldn't find that page."
-        action={<Link to="/"><button className="secondary">Back to home</button></Link>}
+        action={<Link to="/" className="secondary">Back to home</Link>}
       />
     </div>
   );

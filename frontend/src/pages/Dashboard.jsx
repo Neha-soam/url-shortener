@@ -30,8 +30,9 @@ export default function Dashboard() {
       await removeUrl(id);
       showToast('Link deleted');
       load();
-    } catch {
-      showToast('Could not delete this link', 'error');
+    } catch (err) {
+      // 401/403 already show their own toast centrally (services/http.js).
+      if (![401, 403].includes(err.status)) showToast('Could not delete this link', 'error');
     } finally {
       setBusyId(null);
     }

@@ -5,23 +5,34 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import * as authService from '../services/authService.js';
 import { getToken, setToken as persistToken, clearToken } from '../services/tokenStore.js';
 import { registerUnauthorizedHandler } from '../services/http.js';
+import { decodeJwtPayload, isTokenExpired } from '../services/jwt.js';
 
 const AuthContext = createContext(null);
 
 // 'checking' -> 'authenticated' | 'unauthenticated' (section 9's startup flow).
-// ProtectedRoute (phase 3) will show a loading state while status === 'checking'
-// instead of redirecting immediately, to avoid flicker-redirecting logged-in users.
+// ProtectedRoute shows a loading state while status === 'checking' instead of
+// redirecting immediately, to avoid flicker-redirecting a logged-in user.
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState('checking');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // TODO(backend integration): once the backend exposes a current-user /
-    // token-verify endpoint, call it here instead of trusting stored-token
-    // presence alone (section 9: "do not assume a user is authenticated
-    // merely because a client-side token exists").
+    // Client-side check only: reads the token's own exp claim, no network
+    // round trip. This catches the common case (token expired while the tab
+    // was closed) instantly. It CANNOT catch server-side revocation (e.g. an
+    // admin invalidating a token early) -- that still relies on any real
+    // request later coming back 401, which registerUnauthorizedHandler below
+    // handles. A backend GET /api/auth/me would close this gap fully; add it
+    // there if/when the backend exposes one.
     const token = getToken();
-    setStatus(token ? 'authenticated' : 'unauthenticated');
+    if (token && !isTokenExpired(token)) {
+      const payload = decodeJwtPayload(token); // backend signs { id, email } -- see authController.js
+      setUser({ id: payload?.id, email: payload?.email });
+      setStatus('authenticated');
+    } else {
+      if (token) clearToken(); // stale/expired -- don't keep sending a token we know is dead
+      setStatus('unauthenticated');
+    }
 
     registerUnauthorizedHandler(() => {
       clearToken();

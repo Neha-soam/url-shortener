@@ -1,10 +1,7 @@
+// Response shape verified against backend/src/services/analyticsService.js:
+// { rangeDays, totalClicks, clicksOverTime, referrers, devices, browsers }
 import { apiFetch } from './http.js';
-import * as mock from './mock/analyticsService.mock.js';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
-
-async function realGetAnalytics(urlId, days = 30) {
+export async function getAnalytics(urlId, days = 30) {
   return apiFetch(`/urls/${urlId}/analytics?days=${days}`);
 }
-
-export const getAnalytics = USE_MOCK ? mock.getAnalytics : realGetAnalytics;

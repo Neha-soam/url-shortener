@@ -21,8 +21,8 @@ export default function UrlCard({ url, onRequestDelete, deleting }) {
       <p className="meta" style={{ marginBottom: 8 }}>{url.originalUrl}</p>
       <RiskBadge classification={url.classification} />
       <div className="row" style={{ marginTop: 12 }}>
-        <Link to={`/urls/${url.id}`}><button className="secondary">View</button></Link>
-        <Link to={`/analytics/${url.id}`}><button className="secondary">Analytics ({url.clicks})</button></Link>
+        <Link to={`/urls/${url.id}`} className="secondary">View</Link>
+        <Link to={`/analytics/${url.id}`} className="secondary">Analytics ({url.clicks})</Link>
         <button className="secondary" onClick={copy}>Copy</button>
         <button className="secondary" onClick={() => onRequestDelete(url.id)} disabled={deleting}>
           {deleting ? 'Deleting…' : 'Delete'}

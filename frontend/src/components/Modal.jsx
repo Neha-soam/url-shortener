@@ -4,13 +4,18 @@ import React, { useEffect, useRef } from 'react';
 // focus moves to the dialog on open (basic a11y per section 21).
 export default function Modal({ open, onClose, title, children, footer }) {
   const ref = useRef(null);
+  const previouslyFocused = useRef(null);
 
   useEffect(() => {
     if (!open) return;
+    previouslyFocused.current = document.activeElement;
     ref.current?.focus();
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      previouslyFocused.current?.focus?.(); // send focus back to whatever opened this (e.g. the Delete button)
+    };
   }, [open, onClose]);
 
   if (!open) return null;

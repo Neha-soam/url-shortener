@@ -39,9 +39,13 @@ export default function UrlDetails() {
       await removeUrl(id);
       showToast('Link deleted');
       navigate('/dashboard');
-    } catch {
+    } catch (err) {
       setDeleting(false);
-      showToast('Could not delete this link', 'error'); // 403 owner-mismatch lands here too -- don't pretend it worked
+      // 401/403 already show their own toast centrally (services/http.js).
+      // Note: on this backend, deleting a URL you don't own comes back as 404
+      // "URL not found" (not 403) -- see backend/src/services/urlService.js
+      // deleteUrl(). That case falls through to the generic toast below, which is correct.
+      if (![401, 403].includes(err.status)) showToast('Could not delete this link', 'error');
     }
   };
 
