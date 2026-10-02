@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "main": "src/server.js",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test ../tests/unit/generateCode.test.js ../tests/unit/urlValidator.test.js ../tests/security/ssrf.test.js",
+    "test": "node --test ../tests/unit/generateCode.test.js ../tests/unit/urlValidator.test.js ../tests/unit/otp.test.js ../tests/unit/reachability.test.js ../tests/security/ssrf.test.js",
     "test:integration": "node --test ../tests/integration/api.test.js ../tests/security/rateLimit.test.js"
   },
   "dependencies": {
@@ -21,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.0",
     "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
     "zod": "^3.23.8"
   }
 }

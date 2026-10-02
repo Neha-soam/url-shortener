@@ -6,6 +6,7 @@ const { isReserved } = require('../utils/reservedWords');
 const { validateUrl } = require('../utils/urlValidator');
 const cache = require('./cacheService');
 const { classifyUrl } = require('./mlService');
+const { checkReachability } = require('./securityService');
 
 const DUP_KEY = 11000;
 const selfHost = () => new URL(env.BASE_URL).hostname;
@@ -34,11 +35,16 @@ async function createShortUrl({ originalUrl, customAlias, expiresInDays, ownerId
     if (isReserved(customAlias)) throw new AppError(400, 'This alias is reserved');
   }
 
-  // 3. ML classification: exactly once, here
-  const scan = await classifyUrl(v.url);
+  // 3. ML classification + live reachability check: exactly once, here, run
+  // concurrently since they're independent I/O calls (each fails open on
+  // its own, so Promise.all is safe -- neither can reject).
+  const [scan, reachability] = await Promise.all([
+    classifyUrl(v.url),
+    checkReachability(v.url, { timeoutMs: env.REACHABILITY_TIMEOUT_MS }),
+  ]);
 
   const expiresAt = expiresInDays ? new Date(Date.now() + expiresInDays * 86400 * 1000) : null;
-  const base = { originalUrl: v.url, owner: ownerId || null, expiresAt, ...scan };
+  const base = { originalUrl: v.url, owner: ownerId || null, expiresAt, ...scan, reachability };
 
   // 4. insert; DB unique index is the source of truth for uniqueness
   let doc = null;

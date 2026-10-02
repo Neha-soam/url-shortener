@@ -14,6 +14,14 @@ const urlSchema = new mongoose.Schema(
     modelVersion: { type: String, default: null },
     explanation: { type: [String], default: [] },
 
+    // Live "does the destination actually respond" check -- separate from
+    // the ML phishing classification above. See securityService.checkReachability.
+    reachability: {
+      status: { type: String, enum: ['reachable', 'unknown'], default: 'unknown' },
+      httpStatus: { type: Number, default: null },
+      checkedAt: { type: Date, default: null },
+    },
+
     expiresAt: { type: Date, default: null },
     clicks: { type: Number, default: 0 },
   },

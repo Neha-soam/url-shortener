@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getUrlById, removeUrl } from '../services/urlService.js';
 import RiskBadge from '../components/RiskBadge.jsx';
+import ReachabilityBadge from '../components/ReachabilityBadge.jsx';
 import Loading from '../components/Loading.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import EmptyState from '../components/EmptyState.jsx';
@@ -61,8 +62,9 @@ export default function UrlDetails() {
       <p className="field-label" style={{ marginBottom: 4, marginTop: 16 }}>Destination</p>
       <p className="meta" style={{ wordBreak: 'break-all' }}>{url.originalUrl}</p>
 
-      <div className="row" style={{ marginTop: 16 }}>
+      <div className="row" style={{ marginTop: 16, gap: 6 }}>
         <RiskBadge classification={url.classification} />
+        <ReachabilityBadge reachability={url.reachability} />
       </div>
 
       <div className="row" style={{ marginTop: 16, gap: 24 }}>
@@ -72,7 +74,7 @@ export default function UrlDetails() {
       </div>
 
       <div className="row" style={{ marginTop: 20 }}>
-        <Link to={`/analytics/${url.id}`}><button className="secondary">View analytics</button></Link>
+        <Link to={`/analytics/${url.id}`} className="secondary">View analytics</Link>
         <button className="secondary" onClick={copy}>Copy link</button>
         <button className="secondary" onClick={() => setConfirmOpen(true)} disabled={deleting}>
           {deleting ? 'Deleting…' : 'Delete'}

@@ -11,6 +11,16 @@ const authSchema = z.object({
   password: z.string().min(8).max(128),
 });
 
+const startRegistrationSchema = z.object({
+  email: z.string().email().max(254),
+  password: z.string().min(8).max(128),
+});
+
+const verifyRegistrationSchema = z.object({
+  email: z.string().email().max(254),
+  otp: z.string().regex(/^\d{6}$/, 'Code must be 6 digits'),
+});
+
 const validate = (schema) => (req, res, next) => {
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) {
@@ -20,4 +30,4 @@ const validate = (schema) => (req, res, next) => {
   next();
 };
 
-module.exports = { validate, createUrlSchema, authSchema };
+module.exports = { validate, createUrlSchema, authSchema, startRegistrationSchema, verifyRegistrationSchema };

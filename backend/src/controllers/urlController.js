@@ -15,6 +15,10 @@ const present = (doc) => ({
     modelVersion: doc.modelVersion,
     explanation: doc.explanation,
   },
+  reachability: {
+    status: doc.reachability?.status || 'unknown',
+    httpStatus: doc.reachability?.httpStatus ?? null,
+  },
   clicks: doc.clicks,
   expiresAt: doc.expiresAt,
   createdAt: doc.createdAt,

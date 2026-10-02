@@ -19,6 +19,19 @@ const env = {
   ENABLE_RESCANNER: process.env.ENABLE_RESCANNER === 'true',
   RESCAN_CRON: process.env.RESCAN_CRON || '0 3 * * *',
   TRUST_PROXY: process.env.TRUST_PROXY === 'true',
+
+  // Email OTP (registration verification)
+  SMTP_HOST: process.env.SMTP_HOST || '',
+  SMTP_PORT: num(process.env.SMTP_PORT, 587),
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASS: process.env.SMTP_PASS || '',
+  SMTP_FROM: process.env.SMTP_FROM || '',
+  OTP_EXPIRY_MINUTES: num(process.env.OTP_EXPIRY_MINUTES, 10),
+  OTP_RESEND_COOLDOWN_SECONDS: num(process.env.OTP_RESEND_COOLDOWN_SECONDS, 45),
+  OTP_MAX_ATTEMPTS: num(process.env.OTP_MAX_ATTEMPTS, 5),
+
+  // Live reachability check (separate from the ML phishing check)
+  REACHABILITY_TIMEOUT_MS: num(process.env.REACHABILITY_TIMEOUT_MS, 2500),
 };
 
 const missing = ['MONGO_URI', 'JWT_SECRET'].filter((k) => !env[k]);

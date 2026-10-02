@@ -48,8 +48,12 @@ export function AuthProvider({ children }) {
     setStatus('authenticated');
   };
 
-  const register = async (email, password) => {
-    const { token, user: u } = await authService.register(email, password);
+  // Sends the OTP email. Does NOT change auth state -- no account/session
+  // exists yet until verifyRegistration succeeds.
+  const startRegistration = (email, password) => authService.startRegistration(email, password);
+
+  const verifyRegistration = async (email, otp) => {
+    const { token, user: u } = await authService.verifyRegistration(email, otp);
     persistToken(token);
     setUser(u);
     setStatus('authenticated');
@@ -62,7 +66,7 @@ export function AuthProvider({ children }) {
   };
 
   const value = useMemo(
-    () => ({ status, user, isAuthenticated: status === 'authenticated', login, register, logout }),
+    () => ({ status, user, isAuthenticated: status === 'authenticated', login, startRegistration, verifyRegistration, logout }),
     [status, user]
   );
 
